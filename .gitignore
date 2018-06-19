@@ -10,3 +10,4 @@ mongo/db/*
 app.old
 **/.DS_Store
 .dockerignore
+app/package-lock.json

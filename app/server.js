@@ -12,7 +12,7 @@ cronJob.start();
 console.log('cronJob started');
 
 app.listen(3001, function() {
-  console.log("listening on 3001");
+  console.log("listening on 8080");
 });
 
 app.get("/", (req, res) => {
