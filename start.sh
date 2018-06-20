@@ -6,6 +6,6 @@ do
     sleep 1
 done
 echo "\> OK!"
-npm install
+#npm install
 #npm install --save-dev mongoose
-npm start 
+#npm start 

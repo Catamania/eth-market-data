@@ -33,7 +33,7 @@ var addPair = function(pair) {
 
     newPair.save(function(err, p) {
         if (err) return console.error(err);
-        console.log(p.devise + " -> SAVED");
+        console.log(JSON.stringify(p) + " -> SAVED");
         //cb(p, true);
     });
 }
@@ -44,14 +44,19 @@ let retrieveData = function() {
     .postRequest("OHLC", { pair: config.DEVISES, interval: 240 })
     .then(function(responseBody) {
       ohlc1minute = responseBody.result[config.DEVISES];
-      console.log("!! retrieveData !!")
+      //console.log("!! retrieveData !!"+ JSON.stringify(ohlc1minute))
 
-        responseBody.result[config.DEVISES].map(addPair);
+        responseBody.result[config.DEVISES].map(item => {
+            tmp = { provider: "kraken", devise: config.DEVISES, interval: 240, data: item }
+            //console.log(" !!"+ JSON.stringify(tmp))
+            return tmp
+        }).map(addPair);
     })
     .catch(error => console.log(error));
 };
 
 let getOhlc1minute = function() {
+    //console.log("!! getOhlc1minute !!"+ JSON.stringify(ohlc1minute))
   return ohlc1minute;
 };
 

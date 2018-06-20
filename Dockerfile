@@ -22,8 +22,8 @@ ADD start.sh /
 
 CMD ["/start.sh"]
 
-#RUN npm install
+RUN npm install
 #RUN npm install --save-dev mongoose
-#CMD npm start
+CMD npm start
 #RUN chmod +x /start.sh &
 #CMD npm start 
