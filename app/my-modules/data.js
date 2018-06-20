@@ -1,3 +1,4 @@
+var models = require('./db');
 /*
 données (pas persistées)
 */
@@ -27,11 +28,25 @@ let krakenPublicMarketData = require("../my-kraken-api/krakenPublicMarketData");
 <count>
 */
 
+var addPair = function(pair) {
+    var newPair = new models.Pair(pair);
+
+    newPair.save(function(err, p) {
+        if (err) return console.error(err);
+        console.log(p.devise + " -> SAVED");
+        //cb(p, true);
+    });
+}
+
+
 let retrieveData = function() {
   krakenPublicMarketData
     .postRequest("OHLC", { pair: config.DEVISES, interval: 240 })
     .then(function(responseBody) {
       ohlc1minute = responseBody.result[config.DEVISES];
+      console.log("!! retrieveData !!")
+
+        responseBody.result[config.DEVISES].map(addPair);
     })
     .catch(error => console.log(error));
 };
