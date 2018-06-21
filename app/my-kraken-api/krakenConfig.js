@@ -1,4 +1,6 @@
 let config = {
+	provider: "kraken",
+	service: "OHLC",
     url: 'https://api.kraken.com',
     version: '0',
     key: 'pas_besoin_pour_données_publiques',

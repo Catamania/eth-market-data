@@ -43,3 +43,5 @@ pairSchema.statics.findByDevInt = function (dev, inter, cb) {
 var Pair = mongoose.model('Pair', pairSchema);
 
 exports.Pair = Pair;
+
+//db.pairs.find({devise:"XETHZEUR"})

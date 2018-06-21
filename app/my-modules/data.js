@@ -6,6 +6,7 @@ let ohlc1minute;
 
 let config = require("./config");
 let krakenPublicMarketData = require("../my-kraken-api/krakenPublicMarketData");
+let krakenConfig = require("../my-kraken-api/krakenConfig");
 
 /*
 [
@@ -28,13 +29,14 @@ let krakenPublicMarketData = require("../my-kraken-api/krakenPublicMarketData");
 <count>
 */
 
-var addPair = function(pair) {
-    var newPair = new models.Pair(pair);
+var addPair = function(pair, conf, devise) {
+    //ajout des infos pour mise en base
+    pr = { provider: conf.provider, devise: devise, interval: 240, data: pair }
+    var newPair = new models.Pair(pr);
 
     newPair.save(function(err, p) {
         if (err) return console.error(err);
         console.log(JSON.stringify(p) + " -> SAVED");
-        //cb(p, true);
     });
 }
 
@@ -44,13 +46,9 @@ let retrieveData = function() {
     .postRequest("OHLC", { pair: config.DEVISES, interval: 240 })
     .then(function(responseBody) {
       ohlc1minute = responseBody.result[config.DEVISES];
-      //console.log("!! retrieveData !!"+ JSON.stringify(ohlc1minute))
 
-        responseBody.result[config.DEVISES].map(item => {
-            tmp = { provider: "kraken", devise: config.DEVISES, interval: 240, data: item }
-            //console.log(" !!"+ JSON.stringify(tmp))
-            return tmp
-        }).map(addPair);
+        // sauvegarde en db
+        responseBody.result[config.DEVISES].map( item => addPair(item, krakenConfig, config.DEVISES) );
     })
     .catch(error => console.log(error));
 };
