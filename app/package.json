@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "scripts": {
     "test": "babel-node --presets es2015 test-market-data.js",
-    "server": "nodemon server.js --exec babel-node --presets es2015"
+    "server": "nodemon server.js --exec babel-node --presets es2015",
+    "installaunch": "npm install && nodemon server.js --exec babel-node --presets es2015"
   },
   "description": "retrieves eth market data from kraken",
   "author": "AV",

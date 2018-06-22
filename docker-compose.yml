@@ -2,6 +2,7 @@ version: "2.1"
 services:
   server:
     build: .
+    command: npm run installaunch
     ports:
       - "8080:3001"
     depends_on:
@@ -15,8 +16,6 @@ services:
     command: mongod --smallfiles
     volumes:
       - ./mongo/db:/data/db
-    # ports:
-    #   - "27017:27017"
     healthcheck:
       test: ["CMD", "echo", "show dbs", "|", "mongo"]
       interval: 30s

@@ -1,5 +1,5 @@
 let config = {
-	provider: "kraken",
+	name: "kraken",
 	service: "OHLC",
     url: 'https://api.kraken.com',
     version: '0',

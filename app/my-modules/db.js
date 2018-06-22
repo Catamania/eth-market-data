@@ -9,13 +9,13 @@ var mongo_user = process.env.MONGO_USERNAME || '';
 var mongo_db = process.env.MONGO_DATABASE || '';
 
 var url = 'mongodb://' + mongo_user + ':' + mongo_pass + '@' + host + ':' + port + '/' + mongo_db;
-console.log ("user:"+mongo_user+" pwd:"+mongo_pass+" db:"+mongo_db+"\n"+url)
+//console.log ("user:"+mongo_user+" pwd:"+mongo_pass+" db:"+mongo_db+"\n"+url)
+
 /**
  * Initialize the connection.
  * @method init
 **/
 mongoose.connect(url, {
-    //useMongoClient: true,
     server: {
         autoReconnect: true,
         reconnectTries: 30,
