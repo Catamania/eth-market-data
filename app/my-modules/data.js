@@ -1,9 +1,9 @@
-var models = require('./db');
 /*
 données (pas persistées)
 */
 let ohlc1minute;
 
+let models = require('./db');
 let config = require("./config");
 let krakenPublicMarketData = require("../my-kraken-api/krakenPublicMarketData");
 let krakenConfig = require("../my-kraken-api/krakenConfig");
@@ -29,32 +29,36 @@ let krakenConfig = require("../my-kraken-api/krakenConfig");
 <count>
 */
 
-var addPair = function(pair, conf, devise) {
-    //ajout des infos pour mise en base
-    pr = { provider: conf.provider, devise: devise, interval: 240, data: pair }
-    var newPair = new models.Pair(pr);
+let addPair = function(pair, provider, devise) {
+  //ajout des infos pour mise en base
+  let newPair = new models.Pair({ 
+    provider: provider.name, 
+    devise: devise, 
+    interval: 240, 
+    data: pair 
+  });
 
-    newPair.save(function(err, p) {
-        if (err) return console.error(err);
-        console.log(JSON.stringify(p) + " -> SAVED");
+  newPair.save(function(err, p) {
+    if (err) return console.error(err);
+      //console.log(JSON.stringify(p) + " -> SAVED");
     });
 }
 
 
-let retrieveData = function() {
+let retrieveData = function(provider = krakenConfig.config, devise = config.DEVISES) {
   krakenPublicMarketData
-    .postRequest("OHLC", { pair: config.DEVISES, interval: 240 })
-    .then(function(responseBody) {
-      ohlc1minute = responseBody.result[config.DEVISES];
+  .postRequest(provider.service, { pair: devise, interval: 240 })
+  .then(function(responseBody) {
+    // TODO : remove
+    ohlc1minute = responseBody.result[devise];
 
-        // sauvegarde en db
-        responseBody.result[config.DEVISES].map( item => addPair(item, krakenConfig, config.DEVISES) );
+    console.log(" -> Saving data from : "+provider.name+", "+provider.service+", "+config.DEVISES);
+    responseBody.result[config.DEVISES].map( item => addPair(item, provider, devise) );
     })
-    .catch(error => console.log(error));
+  .catch(error => console.log(error));
 };
 
 let getOhlc1minute = function() {
-    //console.log("!! getOhlc1minute !!"+ JSON.stringify(ohlc1minute))
   return ohlc1minute;
 };
 
