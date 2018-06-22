@@ -4,7 +4,7 @@ services:
     build: .
     command: npm run installaunch
     ports:
-      - "8080:3001"
+      - "8088:3001"
     depends_on:
       db:
         condition: service_healthy

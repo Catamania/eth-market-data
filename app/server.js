@@ -12,7 +12,7 @@ cronJob.start();
 console.log('cronJob started');
 
 app.listen(3001, function() {
-  console.log("listening on 8080");
+  console.log("listening on 8088");
 });
 
 app.get("/", (req, res) => {
@@ -26,8 +26,10 @@ app.get("/retrieveData", (req, res) => {
 
 app.get("/ohlc1minute", (req, res) => {
   let size = req.query.size;
-  let fullData = data.getOhlc1minute();
-  let slicedData = fullData.slice(fullData.length - size, fullData.length);
-  res.setHeader("Content-Type", "application/json");
-  res.send(JSON.stringify(slicedData, null, 3));
+  let fullData = data.getOhlc1minute(function (fullData) {
+  	let slicedData = fullData.slice(fullData.length - size, fullData.length).map(item => item.data);
+  	res.setHeader("Content-Type", "application/json");
+  	res.send(JSON.stringify(slicedData, null, 3));
+  });
+  
 });

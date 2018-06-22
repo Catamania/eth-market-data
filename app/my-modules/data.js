@@ -44,13 +44,12 @@ let addPair = function(pair, provider, devise) {
     });
 }
 
-
 let retrieveData = function(provider = krakenConfig.config, devise = config.DEVISES) {
   krakenPublicMarketData
   .postRequest(provider.service, { pair: devise, interval: 240 })
   .then(function(responseBody) {
     // TODO : remove
-    ohlc1minute = responseBody.result[devise];
+    //ohlc1minute = responseBody.result[devise];
 
     console.log(" -> Saving data from : "+provider.name+", "+provider.service+", "+config.DEVISES);
     responseBody.result[config.DEVISES].map( item => addPair(item, provider, devise) );
@@ -58,8 +57,21 @@ let retrieveData = function(provider = krakenConfig.config, devise = config.DEVI
   .catch(error => console.log(error));
 };
 
-let getOhlc1minute = function() {
-  return ohlc1minute;
+
+function getData(devise, interval, cb) {
+    models.Pair.findByDevInt(devise, interval, function(err, d) {
+        if (d) {
+          //console.log("DATA -> "+JSON.stringify(d));
+          console.log("Sending Data found for devise : "+devise+" with this interval -> "+interval);
+          cb(d);
+        } else {
+          console.log("No Data found for devise : "+devise+" with this interval -> "+interval);
+        }
+    });
+};
+
+let getOhlc1minute = function(cb, devise = config.DEVISES, interval = 240) {
+  getData(devise, interval, cb)
 };
 
 module.exports.retrieveData = retrieveData;
