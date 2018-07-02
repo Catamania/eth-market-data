@@ -7,3 +7,5 @@ RUN mkdir /server
 
 #VOLUME ./app:/server
 WORKDIR /server
+
+#RUN npm install ccxt --save-dev

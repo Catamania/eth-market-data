@@ -1,14 +1,14 @@
 'use strict';
 
-var mongoose = require('mongoose');
+let mongoose = require('mongoose');
 
-var port = process.env.DB_PORT || '27017';
-var host = process.env.DB_HOST || 'db';
-var mongo_pass = process.env.MONGO_PASSWORD || '';
-var mongo_user = process.env.MONGO_USERNAME || '';
-var mongo_db = process.env.MONGO_DATABASE || '';
+let port = process.env.DB_PORT || '27017';
+let host = process.env.DB_HOST || 'db';
+let mongo_pass = process.env.MONGO_PASSWORD || '';
+let mongo_user = process.env.MONGO_USERNAME || '';
+let mongo_db = process.env.MONGO_DATABASE || '';
 
-var url = 'mongodb://' + mongo_user + ':' + mongo_pass + '@' + host + ':' + port + '/' + mongo_db;
+let url = 'mongodb://' + mongo_user + ':' + mongo_pass + '@' + host + ':' + port + '/' + mongo_db;
 //console.log ("user:"+mongo_user+" pwd:"+mongo_pass+" db:"+mongo_db+"\n"+url)
 
 /**
@@ -23,24 +23,49 @@ mongoose.connect(url, {
     }
 });
 
-var db = mongoose.connection;
+let db = mongoose.connection;
 
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function () {
     console.log("Connected to MongoDB to: " + url);
 });
 
-var pairSchema = require('./pair')(mongoose);
+
+
+let pairSchema = require('./pair')(mongoose);
 
 // find 
-pairSchema.statics.findByDevInt = function (dev, inter, cb) {
+pairSchema.statics.findByTime = function (from, to, devise, interval, provider, cb) {
     return this.find({
-        devise: dev,
-        interval: inter
-    }, cb);
+            time: { 
+                $gte: from, 
+                $lte: to
+            }, 
+            devise: devise,
+            interval: interval,
+            provider: provider
+        }).
+    select({ data: 1 }).
+    exec(cb);
 };
 
-var Pair = mongoose.model('Pair', pairSchema);
+// find availlable provider
+pairSchema.statics.findProvider = function (cb) {
+    return this.find().distinct('provider', cb);
+};
+
+// find availlable devises
+pairSchema.statics.findDevises = function (cb) {
+    return this.find().distinct('devise', cb);
+};
+
+// find availlable interval
+pairSchema.statics.findInterval = function (cb) {
+    return this.find().distinct('interval', cb);
+};
+
+
+let Pair = mongoose.model('Pair', pairSchema);
 
 exports.Pair = Pair;
 
