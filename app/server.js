@@ -35,7 +35,6 @@ app.get("/ohlc1minute", (req, res) => {
 app.get("/devises", (req, res) => {
 
   dataSupply.getDevise(function (d) {
-  	//let slicedData = d.slice(fullData.length - size, fullData.length).map(item => item.data);
   	res.setHeader("Content-Type", "application/json");
   	res.send(JSON.stringify(d, null, 3));
   });
@@ -52,6 +51,26 @@ app.get("/:provider/:devise/:interval", (req, res) => {
 
   dataSupply.getPairsByTime(from, to, devise, interval, req.params.provider, function (d) {
   	//let slicedData = d.slice(fullData.length - size, fullData.length).map(item => item.data);
+  	res.setHeader("Content-Type", "application/json");
+  	res.send(JSON.stringify(d, null, 3));
+  });
+  
+});
+
+
+app.get("/provider", (req, res) => {
+
+  dataSupply.getProvider(function (d) {
+  	res.setHeader("Content-Type", "application/json");
+  	res.send(JSON.stringify(d, null, 3));
+  });
+  
+});
+
+
+app.get("/interval", (req, res) => {
+
+  dataSupply.getInterval(function (d) {
   	res.setHeader("Content-Type", "application/json");
   	res.send(JSON.stringify(d, null, 3));
   });

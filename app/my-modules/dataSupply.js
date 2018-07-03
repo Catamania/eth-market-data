@@ -71,7 +71,33 @@ function getPairsByTime(from, to, devise, interval, provider, cb) {
     });
 };
 
-//module.exports.retrieveData = retrieveData;
+function getProvider(cb) {
+    models.Pair.findProvider(function(err, d) {
+      if (d) {
+        console.log("Sending availlable provider");
+        console.log("DATA -> "+JSON.stringify(d));
+        cb(d);
+      } else {
+        console.log("No devises found !");
+      }
+    });
+};
 
+
+function getInterval(cb) {
+    models.Pair.findInterval(function(err, d) {
+      if (d) {
+        console.log("Sending availlable Interval");
+        console.log("DATA -> "+JSON.stringify(d));
+        cb(d);
+      } else {
+        console.log("No devises found !");
+      }
+    });
+};
+
+
+module.exports.getInterval = getInterval;
+module.exports.getProvider = getProvider;
 module.exports.getDevise = getDevise;
 module.exports.getPairsByTime = getPairsByTime;
