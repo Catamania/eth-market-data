@@ -15,7 +15,7 @@
             p1 = {from : 1527899400000, to : 1528124400000};
             drawChart("Bittrex", "BTC-USD", 30, p1, 'chart_div1');
 
-            p2 = {from : 1527899400000, to : 1528124400000};
+            p2 = {}//{from : 1527899400000, to : 1528124400000};
             drawChart("Bittrex", "BTC-USD", 30, p2, 'chart_div2');
         }
 
@@ -23,8 +23,12 @@
         // instantiates the pie chart, passes in the data and
         // draws it.
         function drawChart(provider, devise, interval, period, div) {
+            let url = "/"+provider+"/"+devise+"/"+interval
 
-            $.getJSON("/"+provider+"/"+devise+"/"+interval+"?from="+period.from+"&to="+period.to, function (dataArray) {
+            if (period.from && period.to)
+                url += "?from="+period.from+"&to="+period.to
+
+            $.getJSON(url, function (dataArray) {
                 var items = [];
                 $.each(dataArray, function (index) {
                     items.push([

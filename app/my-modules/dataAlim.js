@@ -1,7 +1,5 @@
 let models = require('./db');
 let config = require("./config");
-//let krakenPublicMarketData = require("../my-kraken-api/krakenPublicMarketData");
-//let krakenConfig = require("../my-kraken-api/krakenConfig");
 let cron = require('cron');
 
 let ccxt = require ('ccxt');
@@ -31,15 +29,19 @@ let addPair = function(pair, provider, devise, interval) {
 
 
 let ohlcAlim = function(provider, devise, interval) {
-  console.log (" !! OHLC 3");
-
   if (provider.has.fetchOHLCV) {
     (async () => {
       console.log(" -> Asking data from : "+provider.name+", "+devise);
-      let result = await provider.fetchOHLCV (devise, interval+'m')
+      let result = await provider.fetchOHLCV (devise, interval.int+'m').catch(
+        (err) => {
+          console.log(err);
+        }
+      );
 
-      console.log(" -> Saving data from : "+provider.name+", "+devise);
-      result.map( item => addPair(item, provider, devise, interval) );
+      if (Array.isArray(result)) {
+        console.log(" -> Saving data from : "+provider.name+", "+devise);
+        result.map( item => addPair(item, provider, devise, interval.int) );
+      }
     }) ()
   } else {
     console.log (" !! NO OHLC...");
@@ -48,39 +50,31 @@ let ohlcAlim = function(provider, devise, interval) {
 
 
 let startJob = function(provider, devise, interval) {
-  console.log (" !! OHLC 2");
+  console.log ("First call to "+provider+", for devise "+devise+" and interval "+interval.int);
+  ohlcAlim (provider, devise, interval);
+
   let cronJob = cron.job(interval.cronstr, function () {
-    ohlcAlim (provider, devise, interval.int);
-  }, function () {
-    /* This function is executed when the job stops */
-  },
-  true);
+    ohlcAlim (provider, devise, interval);
+  });
+
+  console.log ("Starting cron job on "+provider+", for devise "+devise+" and interval "+interval.int);
   cronJob.start();
 }
 
-//startJob(exchange["bittrex"], config.DEVISES[0], config.INTERVALS[0]);
-//ohlcAlim (exchange["bittrex"], config.DEVISES[0], config.INTERVALS[0].int);
 
-let startCronJobs = function() {
-  console.log (" !! OHLC 1");
+let forEachTrade = function(msg, cb) {
+  console.log (msg);
   let delay = 0
   let sleep = (ms) => new Promise (resolve => setTimeout (resolve, ms));
 
-
   (async () => {
     for (let i = 0; i < config.INTERVALS.length; i++) {
-      //interval = config.INTERVALS[i];
-      
       for (let p in exchange) {
-        //provider = exchange[p];
-
         for (let j = 0; j < config.DEVISES.length; j++) {
-          //devise = config.DEVISES[j];
-
           // wait 2s between each provider call
           await sleep (delay * 2000)
           delay++
-          startJob(exchange[p], config.DEVISES[j], config.INTERVALS[i])
+          cb(exchange[p], config.DEVISES[j], config.INTERVALS[i])
         }
 
       }
@@ -89,5 +83,22 @@ let startCronJobs = function() {
   }) ()
 }
 
+let startCronJobs = function() {
+  forEachTrade (" !! Starting cron jobs", startJob);
+}
+
+
+let startDevMode = function() {
+  models.Pair.findProvider(function(err, d) {
+      if (d.length > 0) {
+        console.log("Mongo already populate, available pairs : "+JSON.stringify(d));
+      } else {
+        console.log("No data found !");
+        forEachTrade ("populating database ...", ohlcAlim);
+      }
+    });
+}
+
 
 module.exports.startCronJobs = startCronJobs;
+module.exports.startDevMode = startDevMode;

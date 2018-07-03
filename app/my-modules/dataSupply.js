@@ -59,17 +59,6 @@ function getDevise(cb) {
     });
 };
 
-function getPairsByTime(from, to, devise, interval, provider, cb) {
-    models.Pair.findByTime(from, to, devise, interval, provider, function(err, d) {
-      if (d) {
-        console.log("Sending availlable devise");
-        console.log("DATA -> "+JSON.stringify(d));
-        cb( d.map(item => item.data) );
-      } else {
-        console.log("No devises found !\n" + err);
-      }
-    });
-};
 
 function getProvider(cb) {
     models.Pair.findProvider(function(err, d) {
@@ -96,6 +85,18 @@ function getInterval(cb) {
     });
 };
 
+
+function getPairsByTime(from, to, devise, interval, provider, cb) {
+    models.Pair.findByTime(from, to, devise, interval, provider, function(err, d) {
+      if (d) {
+        console.log("Sending availlable devise");
+        //console.log("DATA -> "+JSON.stringify(d));
+        cb( d.map(item => item.data) );
+      } else {
+        console.log("No devises found !\n" + err);
+      }
+    });
+};
 
 module.exports.getInterval = getInterval;
 module.exports.getProvider = getProvider;

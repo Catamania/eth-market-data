@@ -36,15 +36,26 @@ let pairSchema = require('./pair')(mongoose);
 
 // find 
 pairSchema.statics.findByTime = function (from, to, devise, interval, provider, cb) {
-    return this.find({
-            time: { 
-                $gte: from, 
-                $lte: to
-            }, 
-            devise: devise,
-            interval: interval,
-            provider: provider
-        }).
+    let req = { 
+        devise: devise,
+        interval: interval,
+        provider: provider
+    };
+
+    if ( from && to ) {
+        from > to ? (
+            tmp = from,
+            from = to,
+            to = tmp
+        ):(()=>{})
+
+        req.time = { 
+            $gte: from, 
+            $lte: to
+        }
+    }
+
+    return this.find(req).
     select({ data: 1 }).
     exec(cb);
 };
