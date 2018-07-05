@@ -1,6 +1,7 @@
 'use strict';
 
 let mongoose = require('mongoose');
+let minMax = require('./dbMinMax');
 
 let port = process.env.DB_PORT || '27017';
 let host = process.env.DB_HOST || 'db';
@@ -43,6 +44,7 @@ pairSchema.statics.findByTime = function (from, to, devise, interval, provider, 
     };
 
     if ( from && to ) {
+        //s'tait cool mais à modif pour lisibilité
         from > to ? (
             tmp = from,
             from = to,
@@ -59,6 +61,12 @@ pairSchema.statics.findByTime = function (from, to, devise, interval, provider, 
     select({ data: 1 }).
     exec(cb);
 };
+
+// find min and max
+pairSchema.statics.findMinMax = function (devise, interval, provider, cb) {
+    return this.mapReduce(minMax.command(devise, interval, provider), cb);
+};
+
 
 // find availlable provider
 pairSchema.statics.findProvider = function (cb) {
@@ -79,5 +87,3 @@ pairSchema.statics.findInterval = function (cb) {
 let Pair = mongoose.model('Pair', pairSchema);
 
 exports.Pair = Pair;
-
-//db.pairs.find({devise:"XETHZEUR"})

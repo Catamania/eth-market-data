@@ -68,3 +68,18 @@ app.get("/:provider/:devise/:interval", (req, res) => {
   
 });
 
+
+
+app.get("/:provider/:devise/:interval/bound", (req, res) => {
+
+	let interval = parseInt(req.params.interval);
+	let devise = req.params.devise.replace('-', '/');
+
+	dataSupply.getMinMax(devise, interval, req.params.provider, function (d) {
+		res.setHeader("Content-Type", "application/json");
+		res.send(JSON.stringify(d, null, 3));
+	});
+  
+});
+
+
